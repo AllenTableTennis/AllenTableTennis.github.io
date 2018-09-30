@@ -1,0 +1,24 @@
+[debug] [2018-09-28T11:12:50.304Z] ----------------------------------------------------------------------
+[debug] [2018-09-28T11:12:50.306Z] Command:       /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] [2018-09-28T11:12:50.306Z] CLI Version:   4.2.1
+[debug] [2018-09-28T11:12:50.306Z] Platform:      darwin
+[debug] [2018-09-28T11:12:50.306Z] Node Version:  v8.12.0
+[debug] [2018-09-28T11:12:50.306Z] Time:          Fri Sep 28 2018 06:12:50 GMT-0500 (CDT)
+[debug] [2018-09-28T11:12:50.306Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-09-28T11:12:50.314Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-09-28T11:12:50.314Z] > authorizing via signed-in user
+[debug] [2018-09-28T11:12:50.316Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/ahsppcrank  
+ 
+[debug] [2018-09-28T11:12:50.560Z] <<< HTTP RESPONSE 200
+[debug] [2018-09-28T11:12:50.561Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/ahsppcrank  
+ 
+[debug] [2018-09-28T11:12:51.124Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/petercardenas/Documents/Allen Table Tennis Database'...
+[info] 
+[debug] [2018-09-28T11:12:51.126Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/851317372355/clients/_:getWebAppConfig  
+ 
+[debug] [2018-09-28T11:12:51.422Z] <<< HTTP RESPONSE 200
+[info] i  hosting[ahsppcrank]: Serving hosting files from: public
+[info] ✔  hosting[ahsppcrank]: Local server: http://localhost:5000

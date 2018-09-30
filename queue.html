@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href='https://fonts.googleapis.com/css?family=Holtwood+One+SC' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Kaushan+Script|Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Condensed:700' rel='stylesheet' type='text/css'>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Allen Table Tennis</title>
+	<meta name="description" content="Allen Table Tennis Club Website">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@allentabletennis" />
+	<meta name="twitter:title" content="Allen Table Tennis Club Website" />
+	<meta name="twitter:description" content="The official website for the Allen Table Tennis Club of Allen High School in Allen, TX. Come join us for fun and competition in the sport of table tennis/ping pong!" />
+	<meta name="twitter:image" content="https://i.imgur.com/e33bL2Z.png" />
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script type="text/javascript" src="index.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
+</head>
+<body>
+	<header id = "header">
+		<div id = "logoContainer">
+			<div id="logoPictureContainer">
+				<a href="index.html">
+					<img src="images/Logo.png" id="logoPicture">
+				</a>
+			</div>
+			<div id="logoTitleContainer">
+				<div id="logoTitle">
+					<h1>
+						Allen Table Tennis
+					</h1>
+				</div>
+			</div>
+		</div>
+		<div style="clear: both;">
+
+		<div class="nav" id="topNav">
+			<a href="javascript:void(0);" id="menuIcon" class="icon"  onmousedown="toggleResponsive()">
+				<i class="fa fa-bars"></i>
+			</a>
+			<a href="index.html">Home</a>
+			<a href="rules.html">Rules</a>
+			<a class="active" href="queue.html">Queue</a>
+			<a href="rankings.html">Rankings</a>
+			<a href="events.html">Events</a>
+		</div>
+	</header>
+	<div id="queue" class="tabPage">
+		<div id="reserveTable" class="inputField">
+			<h2>
+				Reserve Table
+			</h2>
+
+			<label for="name">Name:</label>
+			<input type="text" name="name" id="name">
+
+			<label for="tableNo">Table #:</label>
+			<select name="tableNo" id="tableNo">
+				<option value="Free Play 1" selected>1</option>
+				<option value="Free Play 2">2</option>
+				<option value="Free Play 3">3</option>
+				<option value="Doubles">4</option>
+			</select>
+			<br>
+
+			<button onclick="reserveTable()">Reserve</button>
+		</div>
+		<div id="tableQueue">
+			<h2>
+				Table Queue
+			</h2>
+
+			<table id = "reservationsTable">
+				<tr class = "tableHeader">
+					<td>Table</td>
+					<td>Name</td>
+					<td>Status</td>
+					<td>Time Left</td>
+				</tr>
+			</table>
+
+		</div>
+		<footer id="footer">
+			<h3>
+				<\> by Allen Computer Science Club
+			</h3>
+
+		</footer>
+	</div>
+	<script type="text/javascript">
+		
+		var config = {
+		    apiKey: "AIzaSyDLcVN0xTbwPzg9IYyC41lyfEOoHMw3EX0",
+		    authDomain: "ahsppcrank.firebaseapp.com",
+		    databaseURL: "https://ahsppcrank.firebaseio.com",
+		    projectId: "ahsppcrank",
+		    storageBucket: "ahsppcrank.appspot.com",
+		    messagingSenderId: "851317372355"
+		};
+		var defaultApp = firebase.initializeApp(config);
+		var database = firebase.database();
+		var rootRef = database.ref();
+		var reservationCache = {};     
+
+		const SEC_PER_MATCH = 420;
+		const updateDBTimeInterval = 1000;
+		const updateTableTimeInterval = 1000;
+
+		
+		var table = document.getElementById("reservationsTable");
+		var tableReservationsRef = rootRef.child('tableReservations'); 
+		//clearDB();
+		//tableReservationsRef = rootRef.child('tableReservations');
+		loadCacheFromDB();
+
+		setInterval(updateDBAndCache, updateDBTimeInterval);
+
+		setInterval(updateTable, updateTableTimeInterval);
+
+		function updateDBAndCache() {
+			for (var reservationKey in reservationCache) {
+				var nowInSec = Math.round(Date.now() / 1000);
+				var timePassed = nowInSec - reservationCache[reservationKey]["startTime"];
+				if (reservationCache[reservationKey]["status"] == 1 && timePassed >= SEC_PER_MATCH) {
+					tableReservationsRef.child(reservationKey).remove();
+					delete reservationCache[reservationKey];
+				}
+				else if (reservationCache[reservationKey]["status"] != 1) {
+					var inPlayKey;
+					var inPlayFound = false
+					tableReservationsRef.orderByChild("status").on("child_added", function(snapshot) {
+						var entry = snapshot.val();
+						if (entry["status"] == 1 && entry["tableNo"] == reservationCache[reservationKey]["tableNo"]) {
+							inPlayKey = snapshot.key;
+							inPlayFound = true;
+						}
+					});
+
+					var inPlayTimePassed = 0;
+					if (inPlayFound) {
+						tableReservationsRef.orderByChild("startTime").on("child_added", function(snapshot) {
+							var entry = snapshot.val();
+							inPlayTimePassed = nowInSec - entry["startTime"];
+						});
+					}
+
+					if (inPlayTimePassed >= SEC_PER_MATCH || !inPlayFound) {
+						reservationCache[reservationKey]["status"] -= 1;
+						tableReservationsRef.child(reservationKey + "/status").set(reservationCache[reservationKey]["status"]);
+					}
+				}
+			}
+		}
+
+		function loadCacheFromDB() {
+			reservationCache = {};
+
+			tableReservationsRef.orderByChild("name").on("child_added", function(snapshot) {
+				var entry = snapshot.val();
+				reservationCache[snapshot.key] = {
+					"name": entry["name"],
+					"tableNo": entry["tableNo"],
+					"status": entry["status"],
+					"startTime": entry["startTime"]
+				}
+			});
+		}
+
+		function clearDB() {
+			var remove = tableReservationsRef.orderByChild("name").on("child_added", function(snapshot) {
+				tableReservationsRef.child(snapshot.key).remove();
+			});
+			tableReservationsRef.off("child_added", remove);
+		}
+
+		function reserveTable() {
+			var reservationName = document.getElementById("name").value;
+			var tableNo = document.getElementById("tableNo").value;
+
+			var startTime;
+			var status;
+
+			var peopleInQueue = 0;
+
+			tableReservationsRef.orderByChild('tableNo').equalTo(tableNo).on("child_added", function(snapshot) {
+				peopleInQueue++;
+			});
+
+			var inPlayKey;
+			var inPlayFound = false;
+			var nowInSec = Math.round(Date.now() / 1000);
+			tableReservationsRef.orderByChild("status").equalTo(1).on("child_added", function(snapshot) {
+				var entry = snapshot.val();
+				if (entry["tableNo"] == tableNo) {
+					inPlayKey = snapshot.key;
+					inPlayFound = true;
+				}
+			});
+
+			var inPlayTimePassed = 0;
+			if (inPlayFound) {
+				tableReservationsRef.orderByChild("startTime").on("child_added", function(snapshot) {
+					var entry = snapshot.val();
+					if (snapshot.key == inPlayKey) {
+						inPlayTimePassed = nowInSec - entry["startTime"];
+					}
+				});
+			}
+			status = peopleInQueue + 1;
+			startTime = nowInSec + (SEC_PER_MATCH * (status - 1)) - inPlayTimePassed;
+			console.log(status);
+			console.log(inPlayTimePassed);
+
+			var newReservationRef = tableReservationsRef.push();
+			var newReservationKey = newReservationRef.key;
+
+			newReservationRef.set({
+				"name": reservationName,
+				"tableNo": tableNo,
+				"status": status,
+				"startTime": startTime
+			});
+
+			reservationCache[newReservationKey] = {
+				"name" : reservationName,
+				"tableNo": tableNo,
+				"status": status,
+				"startTime": startTime
+			}
+			//console.log(newReservationRef);
+			//console.log(reservationCache);
+		}
+
+		function updateTable() {
+			var oldTBody = table.getElementsByTagName("tbody")[0];
+			var newTable = document.createElement("table");
+			var header = newTable.insertRow(-1);
+			header.innerHTML = table.rows[0].innerHTML;
+
+			orderCache();
+
+			for (var reservationKey in reservationCache) {
+				var newRow = newTable.insertRow(-1);
+				var tableCell = newRow.insertCell(-1);
+				var nameCell = newRow.insertCell(-1);
+				var statusCell = newRow.insertCell(-1);
+				var timeCell = newRow.insertCell(-1);
+
+				var tableNo = reservationCache[reservationKey]["tableNo"];
+				var name = reservationCache[reservationKey]["name"];
+				var status = reservationCache[reservationKey]["status"];
+				var startTime = reservationCache[reservationKey]["startTime"];
+
+				var nowInSec = Math.round(Date.now() / 1000);
+
+				var timePassed = nowInSec - startTime;
+
+				var timeLeft;
+
+				if (status == 1) {
+					status = "In Play!";
+					timeLeft = SEC_PER_MATCH - timePassed;
+				}
+				else {
+					status = "No. " + (status - 1) + " In Line.";
+					timeLeft = -timePassed;
+				}
+
+				timeLeft = Math.floor(timeLeft / 60) + "M" + (timeLeft % 60) + "S";
+
+				tableCell.innerText = tableNo;
+				nameCell.innerText = name;
+				statusCell.innerText = status;
+				timeCell.innerText = timeLeft;
+			}
+
+			var newTBody = newTable.getElementsByTagName("tbody")[0];
+			oldTBody.parentNode.replaceChild(newTBody, oldTBody);
+		}
+
+		function orderCache() {
+
+		}
+	</script>
+</body>
+</html>

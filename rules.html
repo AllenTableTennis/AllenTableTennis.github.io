@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href='https://fonts.googleapis.com/css?family=Holtwood+One+SC' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Kaushan+Script|Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Condensed:700' rel='stylesheet' type='text/css'>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Allen Table Tennis</title>
+	<meta name="description" content="Allen Table Tennis Club Website">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@allentabletennis" />
+	<meta name="twitter:title" content="Allen Table Tennis Club Website" />
+	<meta name="twitter:description" content="The official website for the Allen Table Tennis Club of Allen High School in Allen, TX. Come join us for fun and competition in the sport of table tennis/ping pong!" />
+	<meta name="twitter:image" content="https://i.imgur.com/e33bL2Z.png" />
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script type="text/javascript" src="index.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+	<!-- Firebase App is always required and must be first -->
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-app.js"></script>
+
+	<!-- Add additional services that you want to use -->
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-database.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-messaging.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-functions.js"></script>
+</head>
+<body>
+	<header id = "header">
+		<div id = "logoContainer">
+			<div id="logoPictureContainer">
+				<a href="index.html">
+					<img src="images/Logo.png" id="logoPicture">
+				</a>
+			</div>
+			<div id="logoTitleContainer">
+				<div id="logoTitle">
+					<h1>
+						Allen Table Tennis
+					</h1>
+				</div>
+			</div>
+		</div>
+		<div style="clear: both;">
+
+		<div class="nav" id="topNav">
+			<a href="javascript:void(0);" id="menuIcon" class="icon"  onmousedown="toggleResponsive()">
+				<i class="fa fa-bars"></i>
+			</a>
+			<a href="index.html">Home</a>
+			<a class="active" href="rules.html">Rules</a>
+			<a href="queue.html">Queue</a>
+			<a href="rankings.html">Rankings</a>
+			<a href="events.html">Events</a>
+		</div>
+	</header>
+
+	<div id="rules" class="tabPage">
+		<div id="clubRules">
+			<h2>
+				<u>
+					Club Rules:
+				</u>
+			</h2>
+
+			<ul>
+				<li>
+					Clean of any honor code infractions
+				</li>
+				<li>
+					Must not attempt to manipulate or abuse any portion of the ranking system
+				</li>
+				<li>
+					Behave in a manner that reflects good sportsmanship
+				</li>
+			</ul>
+		</div>
+		<div id="tableTennisRules">
+			<h2>
+				<u>
+					Table Tennis Rules:
+				</u>
+			</h2>
+
+			<i>
+				All rules have been paraphrased for your convenience from the official table tennis handbook. For official rules, go 
+				<a href="https://d3mjm6zw6cr45s.cloudfront.net/2018/01/2018ITTFHandbook.pdf" rel="noopener noreferrer" target="_blank">here</a>.
+			</i>
+
+			<ul>
+				<li>
+					A serve must be tossed up vertically 6 inches from an open palm.
+				</li>
+				<li>
+					A serve cannot be spun directly with the hand.
+				</li>
+				<li>
+					A serve must be behind the edge of the table and above the surface of the table.
+				</li>
+				<li>
+					The ball must be visible to the opponent at all times during the serve.
+				</li>
+				<li>
+					A serve must strike the server’s side, bounce over the net, and fall onto the opponent’s side.
+				</li>
+				<li>
+					The ball must hit returner’s side of the table before it can be returned back to the opponent’s side of the table.
+				</li>
+				<li>
+					A let, or re-do, occurs when:
+				</li>
+				<ul>
+					<li>
+						A serve touches the net but is otherwise a valid serve.
+					</li>
+					<li>
+						The opposing player is not ready.
+					</li>
+					<li>
+						The umpire believes there is an error.
+					</li>
+				</ul>
+				<li>
+					Points are scored when:
+				</li>
+				<ul>
+					<li>
+						A let has not occurred.
+					</li>
+					<li>
+						A correct serve is failed.
+					</li>
+					<li>
+						A correct return is failed.
+					</li>
+				</ul>
+				<li>
+					Points go until 11, but a deuce occurs when both players reach 10 points.
+				</li>
+				<li>
+					A deuce is when a player must score 2 more than their opponent to win, and occurs until both players reach 18 points or 10 minutes have past, when the <a href="https://d3mjm6zw6cr45s.cloudfront.net/2018/01/2018ITTFHandbook.pdf#page=30" rel="noopener noreferrer" target="_blank">expedite system</a> is initialized for the current match and subsequent matches.
+				</li>
+			</ul>
+		</div>
+		<div id="tableTennisRules">
+			<h2>
+				<u>
+					Ranking Calculations:
+				</u>
+			</h2>
+			<ul>
+				<li>
+					Players start at 50 points.
+				</li>
+				<li>
+					10 = base point change for equal players, meaning 30 point difference between the players.
+				</li>
+				<li>
+					Minimum of 5 points gained from a match.
+				</li>
+				<li>
+					Maximum point change formula = point difference between two players / 2.
+				</li>
+				<ul>
+					<li>
+						Applied when the point difference is at least 50.
+					</li>
+					<li>
+						Does not apply to streak bonuses.
+					</li>
+				</ul>
+				<li>
+					Win/Lose Streaks:
+				</li>
+				<ul>
+					<li>
+						Bonus/Protection given at a streak of at least 3.
+					</li>
+					<li>
+						Win streak bonus formula = 2 * number of wins.
+					</li>
+					<li>
+						Loss streak protection formula = points lost * (1 - .05 * number of losses).
+					</li>
+					<li>
+						Win streak bonuses give you extra points, and loss streak protection gives cushion to loss of points.
+					</li>
+				</ul>
+				<li>
+					Point change formulas for matches with players with significant point difference:
+				</li>
+				<ul>
+					<li>
+						Formula if the lower point player wins = base point change + point difference * .3; active when there is more than a 30 point difference
+					</li>
+					<li>
+						Formula if the higher point player wins = base point change - (point difference - 50) / 10; active when there is more than a 60 point difference
+					</li>
+				</ul>
+			</ul>
+		</div>
+		<div id="disclaimer">
+			<h2>
+				<u>
+					Disclaimer:
+				</u>
+			</h2>
+			<i>
+				The MMR ranking system is considered to be in ongoing development.  We reserve the right, at our discretion, to change, modify, add, or remove portions of the system at any time. Your continued participation in the club following the revision of the system will mean you accept those changes. 
+			</i>
+			<br><br><br>
+		</div>
+
+	<footer id="footer">
+		<h3>
+			<\> by Allen Computer Science Club
+		</h3>
+	</div>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href='https://fonts.googleapis.com/css?family=Holtwood+One+SC' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Kaushan+Script|Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Condensed:700' rel='stylesheet' type='text/css'>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Allen Table Tennis</title>
+	<meta name="description" content="Allen Table Tennis Club Website">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@allentabletennis" />
+	<meta name="twitter:title" content="Allen Table Tennis Club Website" />
+	<meta name="twitter:description" content="The official website for the Allen Table Tennis Club of Allen High School in Allen, TX. Come join us for fun and competition in the sport of table tennis/ping pong!" />
+	<meta name="twitter:image" content="https://i.imgur.com/e33bL2Z.png" />
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script type="text/javascript" src="index.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+	<!-- Firebase App is always required and must be first -->
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-app.js"></script>
+
+	<!-- Add additional services that you want to use -->
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-database.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-messaging.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-functions.js"></script>
+</head>
+<body>
+	<header id = "header">
+		<div id = "logoContainer">
+			<div id="logoPictureContainer">
+				<a href="index.html">
+					<img src="images/Logo.png" id="logoPicture">
+				</a>
+			</div>
+			<div id="logoTitleContainer">
+				<div id="logoTitle">
+					<h1>
+						Allen Table Tennis
+					</h1>
+				</div>
+			</div>
+		</div>
+		<div style="clear: both;">
+
+		<div class="nav" id="topNav">
+			<a href="javascript:void(0);" id="menuIcon" class="icon"  onmousedown="toggleResponsive()">
+				<i class="fa fa-bars"></i>
+			</a>
+			<a class="active" href="index.html">Home</a>
+			<a href="rules.html">Rules</a>
+			<a href="queue.html">Queue</a>
+			<a href="rankings.html">Rankings</a>
+			<a href="events.html">Events</a>
+		</div>
+	</header>
+	<div id="about" class="tabPage">
+		<div id="general" class="container">
+			<div class="heading">
+				<h1>
+					ABOUT US
+				</h1>
+			</div>
+			<div class="desc">
+				<p>
+					Ping Pong Club aims to promote casual play while introducing a competitive aspect through tournaments and rankings. Tournaments will consist of our top players and be organized in a bracket format. Our tournaments will support charities with the money they raise and allow members to decide what organizations we support. We hope to assist Allen High School students express their passion for ping pong in a meaningful way.
+				</p>
+			</div>
+		</div><br>
+		<div id="meetings" class="container">
+			<div class="heading">
+				<h1>
+					MEETINGS
+				</h1>
+			</div>
+			<div class="desc">
+				<p>
+					Tuesdays Every Week at The Eagle's Nest
+				</p>
+			</div>
+		</div><br>
+		<div id="sponsors" class="container">
+			<div class="heading">
+				<h1>
+					SPONSORS
+				</h1>
+			</div>
+			<div class="desc">
+				<p>
+					Mrs. Creelman - G258<br>
+					Mr. Daley - A210<br>
+					Mr. Torrence - A208<br>
+				</p>
+			</div>
+		</div><br>
+		<div id="contact" class="container">
+			<div class="heading">
+				<h1>
+					CONTACT US
+				</h1>
+			</div>
+			<div class="desc">
+				<a href="mailto:allentabletennis@gmail.com" rel="noopener noreferrer" target="_blank"><i class="fa fa-envelope" aria-hidden="true"></i></a>
+				<a href="https://twitter.com/allentableten" rel="noopener noreferrer" target="_blank"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+				<a href="https://instagram.com/tabletennisallen" rel="noopener noreferrer" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+			</div>
+		</div><br>
+		
+
+	<footer id="footer">
+		<h3>
+			<\> by Allen Computer Science Club
+		</h3>
+
+	</footer>
+	</div>
+
+	<script type="text/javascript">
+		const pages = [
+		document.getElementById("about"),
+		document.getElementById("rules"),
+		document.getElementById("ranking"),
+		document.getElementById("events")
+		]
+
+		changePage(0)
+
+		var players = new Players();
+		var simulation = new Simulation();
+		var chart = new CanvasJS.Chart("rankingsGraph", {data: [{dataPoints: []}]});
+
+		function addPlayerClick() {
+			var firstName = document.getElementById("firstName").value;
+			var lastName = document.getElementById("lastName").value;
+			var ID = parseInt(document.getElementById("ID").value, 10);
+			var player = new Player(firstName, lastName, ID);
+			players.add(player);
+			document.getElementById("firstName").value = "";
+			document.getElementById("lastName").value = "";
+			document.getElementById("ID").value = "";
+		}
+
+		function startMatchClick() {
+			var playerOne = players.getPlayerByID(document.getElementById("playerOneStart").value);
+			var playerTwo = players.getPlayerByID(document.getElementById("playerTwoStart").value);
+			var whichPlayer = Math.floor(Math.random() * 2 + 1) == 1 ? playerOne.firstName : playerTwo.firstName;
+			document.getElementById("startMatchMessage").innerHTML = whichPlayer + " serves.";
+		}
+
+		function endMatchClick() {
+			var playerOne = document.getElementById("playerOneEnd").value;
+			var playerTwo = document.getElementById("playerTwoEnd").value;
+			var playerOneScore = parseInt(document.getElementById("playerOneScore").value, 10);
+			var playerTwoScore = parseInt(document.getElementById("playerTwoScore").value, 10);
+			players.finishMatch(playerOne, playerOneScore, playerTwo, playerTwoScore);
+			players.rank();
+		}
+
+		function simulate() {
+			var numPlayers = parseInt(document.getElementById("numPlayers").value, 10);
+			var runCount = parseInt(document.getElementById("runCount").value, 10);
+			var numMatches = parseInt(document.getElementById("numMatches").value, 10);
+			var avgPointChange = 0;
+			var avgRange = 0;
+
+			for (var i = 0; i < runCount; i++) {
+				simulation.reset(numPlayers);
+
+				for (var j = 0; j < numMatches; j++) {
+					simulation.doMatchedMatches();
+					simulation.rank();
+				}
+
+				avgPointChange += (simulation.totalPoint - simulation.initTotalPoint) / simulation.initTotalPoint;
+				avgRange += simulation.range;
+			}
+
+			avgPointChange /= runCount;
+			avgRange /= runCount;
+
+			document.getElementById("simulationMessage").innerHTML = "Avg Inflation: " + avgPointChange + "\nAvg Range: " + avgRange;
+			chart.options.data[0].dataPoints = simulation.graphData();
+			chart.render();
+		}
+	</script>
+</body>
+</html>
