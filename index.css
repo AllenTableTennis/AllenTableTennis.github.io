@@ -100,14 +100,10 @@ table, td {
 label {
   display: inline-block;
   width: 200px;
-  margin-right: 30px;
-  text-align: right;
 }
 
 .inputField {
-  border: none;
   width: 500px;
-  margin: 0px auto;
 }
 
 #about .container {
@@ -207,7 +203,7 @@ label {
   }
 
   #logoTitle {
-    font-size: 15px;
+    font-size: 12px;
   }
 }
 
