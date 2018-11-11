@@ -120,60 +120,177 @@ function reserveTable() {
 		"status": status,
 		"startTime": startTime
 	}
-			//console.log(newReservationRef);
-			//console.log(reservationCache);
+	//console.log(newReservationRef);
+	//console.log(reservationCache);
+}
+
+function updateTable() {
+	var oldTBody = table.getElementsByTagName("tbody")[0];
+	var newTable = document.createElement("table");
+	var header = newTable.insertRow(-1);
+	header.innerHTML = table.rows[0].innerHTML;
+
+	orderCache();
+
+	for (var reservationKey in reservationCache) {
+		var newRow = newTable.insertRow(-1);
+		var tableCell = newRow.insertCell(-1);
+		var nameCell = newRow.insertCell(-1);
+		var statusCell = newRow.insertCell(-1);
+		var timeCell = newRow.insertCell(-1);
+
+		var tableNo = reservationCache[reservationKey]["tableNo"];
+		var name = reservationCache[reservationKey]["name"];
+		var status = reservationCache[reservationKey]["status"];
+		var startTime = reservationCache[reservationKey]["startTime"];
+
+		var nowInSec = Math.round(Date.now() / 1000);
+
+		var timePassed = nowInSec - startTime;
+
+		var timeLeft;
+
+		if (status == 1) {
+			status = "In Play!";
+			timeLeft = SEC_PER_MATCH - timePassed;
+		}
+		else {
+			status = "No. " + (status - 1) + " In Line.";
+			timeLeft = -timePassed;
 		}
 
-		function updateTable() {
-			var oldTBody = table.getElementsByTagName("tbody")[0];
-			var newTable = document.createElement("table");
-			var header = newTable.insertRow(-1);
-			header.innerHTML = table.rows[0].innerHTML;
+		timeLeft = Math.floor(timeLeft / 60) + "M" + (timeLeft % 60) + "S";
 
-			orderCache();
+		tableCell.innerText = tableNo;
+		nameCell.innerText = name;
+		statusCell.innerText = status;
+		timeCell.innerText = timeLeft;
+	}
 
-			for (var reservationKey in reservationCache) {
-				var newRow = newTable.insertRow(-1);
-				var tableCell = newRow.insertCell(-1);
-				var nameCell = newRow.insertCell(-1);
-				var statusCell = newRow.insertCell(-1);
-				var timeCell = newRow.insertCell(-1);
+	var newTBody = newTable.getElementsByTagName("tbody")[0];
+	oldTBody.parentNode.replaceChild(newTBody, oldTBody);
+}
 
-				var tableNo = reservationCache[reservationKey]["tableNo"];
-				var name = reservationCache[reservationKey]["name"];
-				var status = reservationCache[reservationKey]["status"];
-				var startTime = reservationCache[reservationKey]["startTime"];
+function orderCache() {
 
-				var nowInSec = Math.round(Date.now() / 1000);
+}
 
-				var timePassed = nowInSec - startTime;
 
-				var timeLeft;
+//RANKING CODE
 
-				if (status == 1) {
-					status = "In Play!";
-					timeLeft = SEC_PER_MATCH - timePassed;
-				}
-				else {
-					status = "No. " + (status - 1) + " In Line.";
-					timeLeft = -timePassed;
-				}
+function loadRankingsCache() {
+	playersRef.child(nextID + "").once("value", function(snapshot) {
+  		var player = snapshot.val();
+  		if (snapshot.exists()) {
+  			var matchHistory = player.matchHistory;
+  			var newMatchHistory = [];
+  			for (matchIndex in matchHistory) {
+  				var newMatch = matchHistory[matchIndex];
+  				newMatchHistory.push(new Match(newMatch.pointsFor, newMatch.pointsAgainst));
+  			}
+  			var newPlayer = new Player(
+  				player.firstName, 
+  				player.lastName, 
+  				nextID++, 
+  				player.matchesWon, 
+  				player.matchesLost, 
+  				player.winStreak, 
+  				player.winStreakBonus,
+  				player.lossStreak,
+  				player.lossStreakBonus,
+  				newMatchHistory
+  			);
+  			players.add(newPlayer);
+  			loadRankingsCache();
+  		}
+  		else {
+  			players.rank();
+  		}
+  	});
+}
 
-				timeLeft = Math.floor(timeLeft / 60) + "M" + (timeLeft % 60) + "S";
+function addPlayerClick() {
+	var firstName = document.getElementById("firstName").value;
+	var lastName = document.getElementById("lastName").value;
+	var id = nextID++;
 
-				tableCell.innerText = tableNo;
-				nameCell.innerText = name;
-				statusCell.innerText = status;
-				timeCell.innerText = timeLeft;
-			}
+	var newPlayer = new Player(firstName, lastName, id);
+	players.add(newPlayer);
+	players.rank();
 
-			var newTBody = newTable.getElementsByTagName("tbody")[0];
-			oldTBody.parentNode.replaceChild(newTBody, oldTBody);
-		}
+	var newPlayerRef = playersRef.child(id + ""); 
+	console.log(newPlayer);
+	newPlayerRef.set({
+		"firstName" : newPlayer.firstName,
+		"lastName" : newPlayer.lastName,
+		"matchesWon" : newPlayer.matchesWon,
+		"matchesLost" : newPlayer.matchesLost,
+		"winStreak" : newPlayer.winStreak,
+		"winStreakBonus" : newPlayer.winStreakBonus,
+		"lossStreak" : newPlayer.lossStreak,
+		"lossStreakBonus" : newPlayer.lossPerct,
+		"dateJoined" : Date.now()
+	});
+	newPlayerRef.on('value', snapshot => {
+	  console.log(snapshot.val());
+	});
+}
 
-		function orderCache() {
+function addMatchClick() {
+	var playerOneID = document.getElementById("playerOneAdd").value;
+	var playerOneScore = document.getElementById("playerOneScore").value;
+	var playerTwoID = document.getElementById("playerTwoAdd").value;
+	var playerTwoScore = document.getElementById("playerTwoScore").value;
 
-		}
+	players.finishMatch(playerOneID, playerOneScore, playerTwoID, playerTwoScore);
+
+	var playerOne = players.getPlayerByID(playerOneID);
+	var playerOneLatestMatchId = playerOne.matchHistory.length - 1;
+	var playerOneLatestMatch = playerOne.matchHistory[playerOneLatestMatchId];
+	var playerOneRef = playersRef.child(playerOneID);
+
+	playerOneRef.update({
+		"matchesWon" : playerOne.matchesWon,
+		"matchesLost" : playerOne.matchesLost,
+		"winStreak" : playerOne.winStreak,
+		"winStreakBonus" : playerOne.winStreakBonus,
+		"lossStreak" : playerOne.lossStreak,
+		"lossStreakBonus" : playerOne.lossPerct
+	});
+
+	var playerOneMatches = playerOneRef.child("matchHistory");
+	var playerOneNewMatch = playerOneMatches.child(playerOneLatestMatchId + "");
+
+	playerOneNewMatch.set({
+		"pointsFor" : playerOneLatestMatch.pointsFor,
+		"pointsAgainst" : playerOneLatestMatch.pointsAgainst,
+		"timePlayed" : Date.now()
+	});
+
+	var playerTwo = players.getPlayerByID(playerTwoID);
+	var playerTwoLatestMatchId = playerTwo.matchHistory.length - 1;
+	var playerTwoLatestMatch = playerTwo.matchHistory[playerTwoLatestMatchId];
+	var playerTwoRef = playersRef.child(playerTwoID);
+
+	playerTwoRef.update({
+		"matchesWon" : playerTwo.matchesWon,
+		"matchesLost" : playerTwo.matchesLost,
+		"winStreak" : playerTwo.winStreak,
+		"winStreakBonus" : playerTwo.winStreakBonus,
+		"lossStreak" : playerTwo.lossStreak,
+		"lossStreakBonus" : playerTwo.lossPerct
+	});
+
+	var playerTwoMatches = playerTwoRef.child("matchHistory");
+	var playerTwoNewMatch = playerTwoMatches.child(playerTwoLatestMatchId + "");
+
+	playerTwoNewMatch.set({
+		"pointsFor" : playerTwoLatestMatch.pointsFor,
+		"pointsAgainst" : playerTwoLatestMatch.pointsAgainst,
+		"timePlayed" : Date.now()
+	});
+}
+
 
 ////////////////////////////////////////////////////////////
 ///                   SIMULATION CODE                    ///
@@ -196,18 +313,28 @@ const MAX_WIN_PERCT    = 60;
 const BASE_CHANCE      = 50;
 const PERCT_PER_DIFF   = .2;
 
+class Match {
+	constructor(pointsFor, pointsAgainst) {
+		this.pointsFor = pointsFor;
+		this.pointsAgainst = pointsAgainst;
+		this.result = pointsFor == pointsAgainst ? "tie" : pointsFor > pointsAgainst ? "win" : "loss";
+	}
+}
+
 class Player { 
-	constructor(firstName, lastName, ID) {
+
+	constructor(firstName, lastName, ID, matchesWon = 0, matchesLost = 0, winStreak = 0, winStreakBonus = 0, lossStreak = 0, lossStreakBonus = 1, matchHistory = []) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.ID = ID;
 		this.points = INIT_PT_VAL;
-		this.matchesWon = 0;
-		this.matchesLost = 0;
-		this.winStreak = 0;
-		this.winStreakBonus = 0;
-		this.lossStreak = 0;
-		this.lossPerct = 1;
+		this.matchesWon = matchesWon;
+		this.matchesLost = matchesLost;
+		this.winStreak = winStreak;
+		this.winStreakBonus = winStreakBonus;
+		this.lossStreak = lossStreak;
+		this.lossPerct = lossStreakBonus;
+		this.matchHistory = matchHistory;
 	}
 
 	get description() {
@@ -308,6 +435,7 @@ class Players {
 
 	add(player) {	
 		this.list.push(player);
+		this.rank();
 	}
 
 	get count() {
@@ -337,7 +465,7 @@ class Players {
 
 	getPlayerByID(ID) {
 		for (var i = 0; i < this.count; i++) {
-			if (this.list[i].ID === ID) {
+			if (this.list[i].ID == ID) {
 				return this.list[i];
 			}
 		}
@@ -351,7 +479,10 @@ class Players {
 		var playerOneWin = playerOneScore > playerTwoScore;
 
 		playerOne.finishMatch(playerTwo, playerOneWin);
+		playerOne.matchHistory.push(new Match(playerOneScore, playerTwoScore));
 		playerTwo.finishMatch(playerOne, !playerOneWin);
+		playerTwo.matchHistory.push(new Match(playerTwoScore, playerOneScore));
+		this.rank();
 	}
 
 	rank() {
@@ -373,7 +504,7 @@ class Players {
 			rankCell.innerHTML = i + 1;
 			nameCell.innerHTML = this.list[i].name;
 			pointCell.innerHTML = this.list[i].points;
-			winLossCell.innerHTML = this.list[i].matchesWon + "-" + this.list[i].matchesLost + " " + (this.list[i].matchesWon / (this.list[i].matchesWon + this.list[i].matchesLost));
+			winLossCell.innerHTML = this.list[i].matchesWon + "-" + this.list[i].matchesLost;
 		}
 	}
 }

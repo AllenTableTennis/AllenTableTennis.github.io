@@ -62,7 +62,6 @@
 		</div>
 	</header>
 	<div id="ranking" class="tabPage">
-		<!--
 		<div id = "addPlayer" class="inputField">
 			<h3>Add Player</h3>
 
@@ -72,14 +71,11 @@
 			<label for="lastName">Last name: </label>
 			<input type="text" name="lastName" id="lastName"><br>
 
-			<label for="ID">ID: </label> 
-			<input type="number" name="ID" id="ID"><br>
-
 			<button onclick="addPlayerClick()">Add</button>
 
 			<p id = "addPlayerMessage"> </p><br><br>
 		</div>
-
+		<!--
 		<div id = "startMatch" class="inputField">
 			<h3>Start Match</h3>
 
@@ -93,27 +89,27 @@
 
 			<p id = "startMatchMessage"> </p><br><br>
 		</div>
+		-->
+		<div id = "addMatch" class="inputField">
+			<h3>Add Match</h3>
 
-		<div id = "endMatch" class="inputField">
-			<h3>End Match</h3>
-
-			<label for="playerOneEnd">Player One ID: </label> 
-			<input type="number" name="playerOneEnd" id="playerOneEnd"><br>
+			<label for="playerOneAdd">Player One ID: </label> 
+			<input type="number" name="playerOneAdd" id="playerOneAdd"><br>
 
 			<label for="playerOneScore">Player One Score</label>
 			<input type="number" name="playerOneScore" id="playerOneScore"><br>
 
-			<label for="playerTwoEnd">Player Two ID: </label> 
-			<input type="number" name="playerTwoEnd" id="playerTwoEnd"><br>
+			<label for="playerTwoAdd">Player Two ID: </label> 
+			<input type="number" name="playerTwoAdd" id="playerTwoAdd"><br>
 
 			<label for="playerTwoScore">Player Two Score</label>
 			<input type="number" name="playerTwoScore" id="playerTwoScore"><br>
 
-			<button onclick="endMatchClick()">End Match</button>
+			<button onclick="addMatchClick()">Add Match</button>
 
-			<p id = "endMatchMessage"> </p><br><br>
+			<p id = "addMatchMessage"> </p><br><br>
 		</div>
-
+		<!--
 		<div id = "simulation" class="inputField">
 			<h3>Simulation</h3>
 
@@ -133,9 +129,6 @@
 		-->
 		<div id = "rankings">
 			<h2>Rankings</h2><br>
-			<p>
-				Rankings coming soon!
-			</p><br>
 			<table id = "rankingsTable">
 				<tr class = "tableHeader">
 					<td>Rank</td>
@@ -151,11 +144,34 @@
 		<br><br><br>
 
 
-	<footer id="footer">
-		<h3>
-			<\> by Allen Computer Science Club
-		</h3>
-	</footer>
-</div>
+		<footer id="footer">
+			<h3>
+				<\> by Allen Computer Science Club
+			</h3>
+		</footer>
+	</div>
+	<script type="text/javascript">
+		
+		var config = {
+		    apiKey: "AIzaSyDLcVN0xTbwPzg9IYyC41lyfEOoHMw3EX0",
+		    authDomain: "ahsppcrank.firebaseapp.com",
+		    databaseURL: "https://ahsppcrank.firebaseio.com",
+		    projectId: "ahsppcrank",
+		    storageBucket: "ahsppcrank.appspot.com",
+		    messagingSenderId: "851317372355"
+		};
+		var defaultApp = firebase.initializeApp(config);
+		var database = firebase.database();
+		var rootRef = database.ref();
+		var rankingsCache = {};     
+		
+		var table = document.getElementById("rankingsTable");
+		var playersRef = rootRef.child('players'); 
+		var players = new Players();
+		var nextID = 1000;
+		//clearDB();
+		//tableReservationsRef = rootRef.child('tableReservations');
+		loadRankingsCache();
+	</script>
 </body>
 </html>
